@@ -1,7 +1,7 @@
 import { readFileSync } from 'fs';
 import { join } from 'path';
 
-export default function handler(req: any, res: any) {
+export default function handler(_req: any, res: any) {
   try {
     const filePath = join(process.cwd(), 'data', 'pqrs.json');
     const fileData = readFileSync(filePath, 'utf-8');

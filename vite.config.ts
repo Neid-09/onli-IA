@@ -10,7 +10,7 @@ export default defineConfig({
     {
       name: 'local-api',
       configureServer(server) {
-        server.middlewares.use('/api/pqrs', (req, res) => {
+        server.middlewares.use('/api/pqrs', (_req, res) => {
           try {
             const data = readFileSync(join(process.cwd(), 'data', 'pqrs.json'), 'utf-8');
             res.setHeader('Content-Type', 'application/json');
