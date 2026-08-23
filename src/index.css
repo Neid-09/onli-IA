@@ -36,29 +36,6 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    /* Institutional Dark Palette */
-    --bg: #090b11;
-    --bg-gradient: radial-gradient(circle at 50% 0%, #0f1424 0%, #090b11 70%);
-    --panel-bg: rgba(15, 23, 42, 0.8);
-    --panel-border: rgba(0, 51, 153, 0.25);
-    --text: #94a3b8;
-    --text-muted: #475569;
-    --text-h: #f8fafc;
-    --border: #1e293b;
-    --code-bg: #0f172a;
-    
-    --accent: #3b82f6; /* Lighter blue for dark mode accessibility */
-    --accent-hover: #60a5fa;
-    --accent-bg: rgba(59, 130, 246, 0.1);
-    --accent-border: rgba(59, 130, 246, 0.25);
-    --accent-gradient: linear-gradient(135deg, #003399 0%, #3b82f6 100%);
-    --social-bg: rgba(30, 41, 59, 0.5);
-    --shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
-    --shadow-hover: 0 25px 30px -5px rgba(0, 51, 153, 0.2);
-  }
-}
 
 body {
   margin: 0;

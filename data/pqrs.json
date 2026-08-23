@@ -1,0 +1,102 @@
+[
+  {
+    "id": "PQRS-001",
+    "solicitante": "Juan Pérez",
+    "categoria": "Agua",
+    "descripcion": "Fuga de agua constante en la tubería principal del barrio.",
+    "estado": "En trámite",
+    "fechaRadicacion": "2026-08-15T08:30:00Z",
+    "plazoLegal": "2026-08-30T08:30:00Z",
+    "respuestaOficial": ""
+  },
+  {
+    "id": "PQRS-002",
+    "solicitante": "María Gómez",
+    "categoria": "Basuras",
+    "descripcion": "No ha pasado el camión recolector de basuras en 3 días.",
+    "estado": "Resuelto",
+    "fechaRadicacion": "2026-08-10T14:15:00Z",
+    "plazoLegal": "2026-08-25T14:15:00Z",
+    "respuestaOficial": "Se reprogramó la ruta y se realizó la recolección el día 12 de agosto."
+  },
+  {
+    "id": "PQRS-003",
+    "solicitante": "Carlos Rodríguez",
+    "categoria": "Alumbrado",
+    "descripcion": "Luminaria fundida en el parque principal frente a la alcaldía.",
+    "estado": "En trámite",
+    "fechaRadicacion": "2026-08-18T11:45:00Z",
+    "plazoLegal": "2026-09-02T11:45:00Z",
+    "respuestaOficial": ""
+  },
+  {
+    "id": "PQRS-004",
+    "solicitante": "Ana Martínez",
+    "categoria": "Agua",
+    "descripcion": "El agua llega con mucha turbiedad desde hace una semana.",
+    "estado": "Resuelto",
+    "fechaRadicacion": "2026-08-01T09:20:00Z",
+    "plazoLegal": "2026-08-16T09:20:00Z",
+    "respuestaOficial": "Se realizó mantenimiento en la planta de tratamiento y se purgó la red local."
+  },
+  {
+    "id": "PQRS-005",
+    "solicitante": "Pedro Ramírez",
+    "categoria": "Basuras",
+    "descripcion": "Vecinos dejan escombros en la vía pública obstaculizando el paso.",
+    "estado": "En trámite",
+    "fechaRadicacion": "2026-08-21T16:05:00Z",
+    "plazoLegal": "2026-09-05T16:05:00Z",
+    "respuestaOficial": ""
+  },
+  {
+    "id": "PQRS-006",
+    "solicitante": "Lucía Fernández",
+    "categoria": "Alumbrado",
+    "descripcion": "Poste de luz ladeado con riesgo de caída tras la tormenta.",
+    "estado": "Resuelto",
+    "fechaRadicacion": "2026-08-05T07:10:00Z",
+    "plazoLegal": "2026-08-20T07:10:00Z",
+    "respuestaOficial": "Cuadrilla técnica estabilizó y reforzó la base del poste de manera urgente."
+  },
+  {
+    "id": "PQRS-007",
+    "solicitante": "Javier Morales",
+    "categoria": "Agua",
+    "descripcion": "Cobro excesivo en la última factura, no corresponde al consumo habitual.",
+    "estado": "En trámite",
+    "fechaRadicacion": "2026-08-19T13:40:00Z",
+    "plazoLegal": "2026-09-03T13:40:00Z",
+    "respuestaOficial": ""
+  },
+  {
+    "id": "PQRS-008",
+    "solicitante": "Sofía Castro",
+    "categoria": "Basuras",
+    "descripcion": "Falta de contenedores de reciclaje en la zona comercial.",
+    "estado": "En trámite",
+    "fechaRadicacion": "2026-08-22T10:30:00Z",
+    "plazoLegal": "2026-09-06T10:30:00Z",
+    "respuestaOficial": ""
+  },
+  {
+    "id": "PQRS-009",
+    "solicitante": "Diego Herrera",
+    "categoria": "Alumbrado",
+    "descripcion": "Luces de la calle parpadean toda la noche y no iluminan bien.",
+    "estado": "Resuelto",
+    "fechaRadicacion": "2026-08-12T15:20:00Z",
+    "plazoLegal": "2026-08-27T15:20:00Z",
+    "respuestaOficial": "Se reemplazaron los balastros y bombillas defectuosas del sector."
+  },
+  {
+    "id": "PQRS-010",
+    "solicitante": "Elena Vargas",
+    "categoria": "Agua",
+    "descripcion": "Corte de agua sin previo aviso desde hace más de 12 horas.",
+    "estado": "En trámite",
+    "fechaRadicacion": "2026-08-23T08:00:00Z",
+    "plazoLegal": "2026-09-07T08:00:00Z",
+    "respuestaOficial": ""
+  }
+]

@@ -1,0 +1,131 @@
+.detalle-container {
+  padding: 40px 20px;
+  color: var(--text);
+  box-sizing: border-box;
+}
+
+.detalle-content {
+  max-width: 800px;
+  margin: 0 auto;
+  background: var(--panel-bg);
+  border-radius: 24px;
+  padding: 40px;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+  backdrop-filter: blur(16px);
+  animation: slideUp 0.4s ease-out;
+}
+
+.detalle-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 30px;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 24px;
+}
+
+.detalle-title-group h1 {
+  margin: 0 0 12px 0;
+  font-size: 2.2rem;
+  color: var(--text-h);
+  font-family: var(--mono);
+}
+
+.detalle-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.btn-volver, .btn-copiar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+  font-family: var(--sans);
+}
+
+.btn-volver {
+  background: var(--code-bg);
+  color: var(--text-muted);
+}
+
+.btn-volver:hover {
+  background: var(--border);
+  color: var(--text-h);
+}
+
+.btn-copiar {
+  background: var(--accent);
+  color: white;
+  box-shadow: 0 4px 6px -1px rgba(0, 51, 153, 0.1);
+}
+
+.btn-copiar:hover {
+  background: var(--accent-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgba(0, 51, 153, 0.2);
+}
+
+.ficha-tecnica {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+.ficha-seccion {
+  background: var(--bg);
+  padding: 20px;
+  border-radius: 16px;
+  border: 1px solid var(--panel-border);
+}
+
+.ficha-seccion.full-width {
+  grid-column: 1 / -1;
+}
+
+.ficha-label {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 700;
+  margin-bottom: 8px;
+  display: block;
+}
+
+.ficha-valor {
+  font-size: 1.1rem;
+  color: var(--text-h);
+  margin: 0;
+  line-height: 1.6;
+}
+
+.respuesta-oficial-box {
+  background: rgba(5, 150, 105, 0.05);
+  border-left: 4px solid #059669;
+  padding: 24px;
+  border-radius: 0 12px 12px 0;
+  margin-top: 30px;
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 640px) {
+  .ficha-tecnica {
+    grid-template-columns: 1fr;
+  }
+  .detalle-header {
+    flex-direction: column;
+    gap: 20px;
+  }
+}
