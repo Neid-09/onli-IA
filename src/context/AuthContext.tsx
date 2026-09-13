@@ -95,11 +95,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
   }, []);
 
+  const getRedirectUrl = () => {
+    // 1. Si existe variable de entorno con la URL de producción
+    const configuredUrl = import.meta.env.VITE_SITE_URL || import.meta.env.VITE_APP_URL;
+    if (configuredUrl) {
+      return configuredUrl.replace(/\/$/, '');
+    }
+
+    // 2. Usar el origen actual dinámico del navegador
+    if (typeof window !== 'undefined' && window.location?.origin) {
+      return window.location.origin;
+    }
+
+    return 'http://localhost:5173';
+  };
+
   const signInWithGoogle = async () => {
     if (!isSupabaseConfigured) {
       alert('Supabase no está configurado');
       return;
     }
+
+    const redirectUrl = getRedirectUrl();
 
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
@@ -108,7 +125,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           prompt: 'select_account', // Muestra siempre la selección de cuentas de Google
           access_type: 'offline',
         },
-        redirectTo: window.location.origin,
+        redirectTo: redirectUrl,
       },
     });
 

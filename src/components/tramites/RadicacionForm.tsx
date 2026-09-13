@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
-import { Send, CheckCircle2, Copy, Check, FileText, User, Mail, Tag, AlertCircle } from 'lucide-react';
+import { Send, CheckCircle2, Copy, Check, FileText, User, Mail, Tag, AlertCircle, Sparkles, ScanLine } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { pqrsService } from '../../services/pqrsService';
+import DocumentScannerModal from './DocumentScannerModal';
+import type { ExtractedDocumentData } from '../../services/ai/aiTypes';
 
 interface Props {
   onSuccess?: (id: string) => void;
@@ -19,6 +21,18 @@ export default function RadicacionForm({ onSuccess }: Props) {
   const [error, setError] = useState<string | null>(null);
   const [radicadoCreado, setRadicadoCreado] = useState<string | null>(null);
   const [copiado, setCopiado] = useState(false);
+  const [isScannerOpen, setIsScannerOpen] = useState(false);
+  const [ocrApplied, setOcrApplied] = useState(false);
+
+  const handleOcrExtracted = (data: ExtractedDocumentData) => {
+    if (data.solicitante) setSolicitante(data.solicitante);
+    if (data.identificacion) setIdentificacion(data.identificacion);
+    if (data.email) setEmail(data.email);
+    if (data.categoria) setCategoria(data.categoria);
+    if (data.asunto) setAsunto(data.asunto);
+    if (data.descripcion) setDescripcion(data.descripcion);
+    setOcrApplied(true);
+  };
 
   // Sincronizar automáticamente si el usuario se autentica
   React.useEffect(() => {
@@ -135,15 +149,45 @@ export default function RadicacionForm({ onSuccess }: Props) {
 
   return (
     <div className="bg-white rounded-3xl p-8 md:p-10 shadow-xl shadow-slate-200/50 border border-slate-100 max-w-3xl mx-auto">
-      <div className="flex items-center gap-3 mb-6 pb-6 border-b border-slate-100">
-        <div className="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center">
-          <FileText size={24} />
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 pb-6 border-b border-slate-100">
+        <div className="flex items-center gap-3">
+          <div className="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
+            <FileText size={24} />
+          </div>
+          <div>
+            <h3 className="text-2xl font-bold text-slate-900">Ventanilla Única de Radicación</h3>
+            <p className="text-slate-500 text-sm">Ingrese su derecho de petición, queja, reclamo o solicitud ciudadana</p>
+          </div>
         </div>
-        <div>
-          <h3 className="text-2xl font-bold text-slate-900">Ventanilla Única de Radicación</h3>
-          <p className="text-slate-500 text-sm">Ingrese su derecho de petición, queja, reclamo o solicitud ciudadana</p>
-        </div>
+
+        {/* Botón Escanear OCR */}
+        <button
+          type="button"
+          onClick={() => setIsScannerOpen(true)}
+          className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-linear-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-xl font-bold text-xs shadow-md shadow-indigo-500/20 hover:shadow-lg transition-all hover:-translate-y-0.5 cursor-pointer shrink-0"
+        >
+          <ScanLine size={16} />
+          <span>Escanear Documento (OCR IA)</span>
+        </button>
       </div>
+
+      {ocrApplied && (
+        <div className="mb-6 p-4 bg-emerald-50 border border-emerald-200 rounded-2xl text-emerald-800 text-sm flex items-center justify-between">
+          <div className="flex items-center gap-2.5">
+            <Sparkles size={18} className="text-emerald-600 shrink-0" />
+            <span>
+              <strong>¡Documento escaneado exitosamente!</strong> Los campos han sido autocompletados con el análisis multimodal. Por favor revisa y ajusta los datos antes de radicar.
+            </span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setOcrApplied(false)}
+            className="text-xs text-emerald-700 hover:underline font-semibold ml-2"
+          >
+            Cerrar aviso
+          </button>
+        </div>
+      )}
 
       {error && (
         <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-2xl text-red-600 text-sm flex items-center gap-2.5">
@@ -259,6 +303,13 @@ export default function RadicacionForm({ onSuccess }: Props) {
           </button>
         </div>
       </form>
+
+      {/* Modal de Escáner y OCR Multimodal */}
+      <DocumentScannerModal
+        isOpen={isScannerOpen}
+        onClose={() => setIsScannerOpen(false)}
+        onExtracted={handleOcrExtracted}
+      />
     </div>
   );
 }

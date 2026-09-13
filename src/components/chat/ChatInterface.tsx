@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import ChatMessage from './ChatMessage';
 import InputBox from './InputBox';
 import { X, Minimize2, Sparkles } from 'lucide-react';
+import { aiService } from '../../services/ai/aiService';
 
 interface Message {
   role: 'user' | 'assistant' | 'system';
@@ -62,13 +63,27 @@ export default function ChatInterface({ onClose }: { onClose: () => void }) {
   };
 
   const handleSend = async (input: string) => {
-    // Add user message
-    setMessages(prev => [...prev, { role: 'user', content: input }]);
+    // Agregar mensaje del usuario
+    const updatedMessages: Message[] = [...messages, { role: 'user', content: input }];
+    setMessages(updatedMessages);
     
-    // Pick a random mock response
-    const responseText = MOCK_RESPONSES[Math.floor(Math.random() * MOCK_RESPONSES.length)];
-    
-    await simulateStreaming(responseText);
+    try {
+      // Filtrar historial para el contexto de la IA
+      const chatHistory = updatedMessages
+        .filter(m => m.role === 'user' || m.role === 'assistant')
+        .slice(-6)
+        .map(m => ({ role: m.role as 'user' | 'assistant', content: m.content }));
+
+      const systemContext = `Eres el Asistente Virtual Oficial de Atención Ciudadana del Gobierno Local. 
+Responde de manera amable, formal, concisa y orientada a guiar al ciudadano en trámites de servicios básicos (Agua, Basuras, Alumbrado, Vías), radicación de PQRS y consulta de expedientes.`;
+      
+      const responseText = await aiService.askAssistant(`${systemContext}\n\nPregunta del ciudadano: ${input}`, chatHistory);
+      await simulateStreaming(responseText);
+    } catch (err) {
+      console.warn('Fallback en chat:', err);
+      const fallbackResponse = MOCK_RESPONSES[Math.floor(Math.random() * MOCK_RESPONSES.length)];
+      await simulateStreaming(fallbackResponse);
+    }
   };
 
   if (isMinimized) {

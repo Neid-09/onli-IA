@@ -6,7 +6,8 @@ import ChatInterface from './components/chat/ChatInterface'
 import UserNav from './components/auth/UserNav'
 import { AuthProvider } from './context/AuthContext'
 import RadicacionForm from './components/tramites/RadicacionForm'
-import { Sparkles, FilePlus2, LayoutGrid } from 'lucide-react'
+import NormativasPage from './pages/NormativasPage'
+import { Sparkles, FilePlus2, LayoutGrid, Scale } from 'lucide-react'
 
 function AppContent() {
   const [currentPath, setCurrentPath] = useState(window.location.pathname);
@@ -25,9 +26,10 @@ function AppContent() {
   };
 
   const isConsultas = currentPath === '/consultas';
+  const isNormativas = currentPath === '/normativas';
   const isDetalle = currentPath.startsWith('/consultas/') && currentPath.length > '/consultas/'.length;
   const detalleId = isDetalle ? currentPath.split('/')[2] : null;
-  const isInicio = !isConsultas && !isDetalle;
+  const isInicio = !isConsultas && !isDetalle && !isNormativas;
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-50">
@@ -60,6 +62,13 @@ function AppContent() {
                   className={`text-sm font-medium transition-colors hover:text-blue-600 ${isConsultas ? 'text-blue-600' : 'text-slate-600'}`}
                 >
                   Consultar Trámites
+                </button>
+                <button 
+                  onClick={() => navigate('/normativas')} 
+                  className={`text-sm font-medium transition-colors hover:text-blue-600 flex items-center gap-1.5 ${isNormativas ? 'text-blue-600' : 'text-slate-600'}`}
+                >
+                  <Scale size={15} />
+                  <span>Normativa & Leyes</span>
                 </button>
               </nav>
               <div className="pl-4 border-l border-slate-200">
@@ -146,6 +155,7 @@ function AppContent() {
         )}
 
         {isConsultas && <ConsultasPage onNavigate={navigate} />}
+        {isNormativas && <NormativasPage />}
         {isDetalle && detalleId && <DetalleConsultaPage id={detalleId} onNavigate={navigate} />}
       </div>
 
