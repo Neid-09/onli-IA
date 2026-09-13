@@ -35,3 +35,13 @@ export interface Profile {
   updated_at?: string;
 }
 
+export interface SystemAIConfig {
+  id: 'chat_assistant' | 'ocr_multimodal' | 'embeddings_search' | string;
+  name: string;
+  description?: string;
+  provider: 'gemini' | 'grok' | 'openai' | string;
+  model_name: string;
+  api_key: string;
+  is_active: boolean;
+  updated_at?: string;
+}

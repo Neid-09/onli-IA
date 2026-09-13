@@ -4,7 +4,11 @@ import { useAuth } from '../../context/AuthContext';
 import LoginModal from './LoginModal';
 import SetPasswordModal from './SetPasswordModal';
 
-export default function UserNav() {
+interface Props {
+  onNavigate?: (path: string) => void;
+}
+
+export default function UserNav({ onNavigate }: Props) {
   const { user, profile, signOut, loading } = useAuth();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isLoginOpen, setIsLoginOpen] = useState(false);
@@ -93,6 +97,19 @@ export default function UserNav() {
           </div>
 
           <div className="py-1">
+            {profile.role === 'administrador' && (
+              <button
+                onClick={() => {
+                  setIsDropdownOpen(false);
+                  if (onNavigate) onNavigate('/admin');
+                }}
+                className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-purple-700 hover:bg-purple-50 transition-colors text-left font-bold"
+              >
+                <Shield size={16} className="text-purple-600" />
+                <span>Panel Administrativo</span>
+              </button>
+            )}
+
             <button
               onClick={() => {
                 setIsDropdownOpen(false);

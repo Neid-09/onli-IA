@@ -7,6 +7,7 @@ import UserNav from './components/auth/UserNav'
 import { AuthProvider } from './context/AuthContext'
 import RadicacionForm from './components/tramites/RadicacionForm'
 import NormativasPage from './pages/NormativasPage'
+import AdminPage from './pages/AdminPage'
 import { Sparkles, FilePlus2, LayoutGrid, Scale } from 'lucide-react'
 
 function AppContent() {
@@ -27,9 +28,10 @@ function AppContent() {
 
   const isConsultas = currentPath === '/consultas';
   const isNormativas = currentPath === '/normativas';
+  const isAdmin = currentPath === '/admin';
   const isDetalle = currentPath.startsWith('/consultas/') && currentPath.length > '/consultas/'.length;
   const detalleId = isDetalle ? currentPath.split('/')[2] : null;
-  const isInicio = !isConsultas && !isDetalle && !isNormativas;
+  const isInicio = !isConsultas && !isDetalle && !isNormativas && !isAdmin;
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-50">
@@ -72,7 +74,7 @@ function AppContent() {
                 </button>
               </nav>
               <div className="pl-4 border-l border-slate-200">
-                <UserNav />
+                <UserNav onNavigate={navigate} />
               </div>
             </div>
           </div>
@@ -156,6 +158,7 @@ function AppContent() {
 
         {isConsultas && <ConsultasPage onNavigate={navigate} />}
         {isNormativas && <NormativasPage />}
+        {isAdmin && <AdminPage onNavigate={navigate} />}
         {isDetalle && detalleId && <DetalleConsultaPage id={detalleId} onNavigate={navigate} />}
       </div>
 
