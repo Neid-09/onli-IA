@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import './ConsultasPage.css';
+import { Search, AlertCircle, Info, ArrowRight, ShieldCheck, Clock } from 'lucide-react';
 
 interface PQRS {
   id: string;
@@ -27,7 +27,6 @@ export default function ConsultasPage({ onNavigate }: { onNavigate: (path: strin
         throw new Error('Error al conectar con el servidor.');
       }
       const result = await response.json();
-      // Retardo de 800ms para visualizar la microanimación de carga (spinner)
       setTimeout(() => {
         setData(result);
         setLoading(false);
@@ -53,82 +52,119 @@ export default function ConsultasPage({ onNavigate }: { onNavigate: (path: strin
   });
 
   return (
-    <div className="consultas-container">
-      <div className="consultas-header">
-        <h1>Consulta de Trámites</h1>
-        <p>Realiza seguimiento a tus peticiones, quejas, reclamos y sugerencias de manera transparente.</p>
+    <div className="relative min-h-screen pb-20 animate-in fade-in duration-700">
+      {/* Ambient background */}
+      <div className="absolute top-0 left-0 w-full h-96 bg-linear-to-b from-indigo-50/80 to-transparent -z-10" />
+
+      <div className="max-w-6xl mx-auto pt-10">
         
-        <div className="search-bar">
-          <input 
-            type="text" 
-            placeholder="Buscar por ID, solicitante, descripción o categoría..." 
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-        </div>
-      </div>
-
-      <div className="consultas-content">
-        {loading && (
-          <div className="state-container loading-state">
-            <div className="spinner"></div>
-            <h2>Cargando información...</h2>
-            <p>Conectando con el servidor para obtener los trámites recientes.</p>
-          </div>
-        )}
-
-        {!loading && error && (
-          <div className="state-container error-state">
-            <div className="error-icon">⚠️</div>
-            <h2>Fallo de Conexión</h2>
-            <p>{error}</p>
-            <button className="retry-button" onClick={fetchData}>
-              Reintentar
-            </button>
-          </div>
-        )}
-
-        {!loading && !error && filteredData.length === 0 && (
-          <div className="state-container empty-state">
-            <div className="empty-icon">🔍</div>
-            <h2>No se encontraron trámites</h2>
-            <p>Intenta ajustar tu búsqueda para ver otros resultados.</p>
-          </div>
-        )}
-
-        {!loading && !error && filteredData.length > 0 && (
-          <div className="pqrs-grid">
-            {filteredData.map((item) => (
-              <div 
-                key={item.id} 
-                className="pqrs-card" 
-                onClick={() => onNavigate(`/consultas/${item.id}`)}
-                style={{ cursor: 'pointer' }}
-              >
-                <div className="card-header">
-                  <span className="pqrs-id">{item.id}</span>
-                  <span className={`status-badge ${item.estado === 'Resuelto' ? 'status-resolved' : 'status-pending'}`}>
-                    {item.estado}
-                  </span>
-                </div>
-                <div className="card-body">
-                  <h3 className="category">{item.categoria}</h3>
-                  <p className="description">{item.descripcion}</p>
-                  <div className="details">
-                    <p><strong>Solicitante:</strong> <span>{item.solicitante}</span></p>
-                    <p><strong>Radicado:</strong> <span>{new Date(item.fechaRadicacion).toLocaleDateString()}</span></p>
-                    <p><strong>Plazo Legal:</strong> <span>{new Date(item.plazoLegal).toLocaleDateString()}</span></p>
-                  </div>
-                  {item.respuestaOficial && (
-                    <div style={{ marginTop: '16px', background: 'rgba(5, 150, 105, 0.05)', padding: '12px', borderRadius: '8px', borderLeft: '4px solid #059669' }}>
-                      <p style={{ margin: 0, fontSize: '0.85rem', color: '#047857' }}><strong>Respuesta Oficial:</strong> {item.respuestaOficial}</p>
-                    </div>
-                  )}
-                </div>
+        {/* Header */}
+        <div className="text-center max-w-3xl mx-auto mb-16">
+          <h1 className="text-4xl md:text-5xl font-black text-slate-900 tracking-tight mb-6">
+            Portal de Transparencia
+          </h1>
+          <p className="text-lg md:text-xl text-slate-600 font-light leading-relaxed">
+            Consulte el estado de sus peticiones, quejas, reclamos y sugerencias. Escriba su número de radicado o detalles del caso.
+          </p>
+          
+          {/* Search Bar */}
+          <div className="relative mt-10 max-w-2xl mx-auto group">
+            <div className="absolute inset-0 bg-indigo-500 rounded-2xl blur-xl opacity-20 group-focus-within:opacity-40 transition-opacity duration-500" />
+            <div className="relative flex items-center bg-white rounded-2xl shadow-xl shadow-slate-200/50 border border-slate-100 overflow-hidden">
+              <div className="pl-6 text-indigo-500">
+                <Search size={24} strokeWidth={2.5} />
               </div>
-            ))}
+              <input 
+                type="text" 
+                placeholder="Ej. PQR-2026-001 o nombre del solicitante..." 
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-4 pr-6 py-5 bg-transparent text-slate-900 text-lg placeholder:text-slate-400 focus:outline-none font-medium"
+              />
+            </div>
           </div>
-        )}
+        </div>
+
+        <div className="w-full">
+          {loading && (
+            <div className="flex flex-col items-center justify-center py-24 px-4 text-center">
+              <div className="relative w-16 h-16 flex items-center justify-center mb-6">
+                <div className="absolute inset-0 rounded-full border-t-2 border-indigo-600 animate-spin"></div>
+                <div className="absolute inset-2 rounded-full border-r-2 border-emerald-500 animate-spin-reverse"></div>
+              </div>
+              <h2 className="text-xl font-bold text-slate-900 mb-2">Sincronizando expedientes...</h2>
+              <p className="text-slate-500">Conectando de forma segura con el servidor central.</p>
+            </div>
+          )}
+
+          {!loading && error && (
+            <div className="flex flex-col items-center justify-center py-20 px-4 text-center bg-white/50 backdrop-blur-sm border border-slate-200 rounded-3xl shadow-sm max-w-2xl mx-auto">
+              <AlertCircle size={48} className="text-red-500 mb-4" />
+              <h2 className="text-2xl font-bold text-slate-900 mb-3">Fallo de Conexión</h2>
+              <p className="text-slate-600 mb-8 max-w-md text-lg">{error}</p>
+              <button 
+                onClick={fetchData}
+                className="px-8 py-3 bg-slate-900 text-white font-semibold rounded-xl hover:bg-slate-800 transition-all hover:shadow-lg hover:-translate-y-0.5"
+              >
+                Reintentar Conexión
+              </button>
+            </div>
+          )}
+
+          {!loading && !error && filteredData.length === 0 && (
+            <div className="flex flex-col items-center justify-center py-24 px-4 text-center bg-white/50 backdrop-blur-sm border border-slate-200 rounded-3xl shadow-sm max-w-2xl mx-auto">
+              <Info size={48} className="text-indigo-300 mb-6" />
+              <h2 className="text-2xl font-bold text-slate-900 mb-3">No se encontraron expedientes</h2>
+              <p className="text-slate-600 text-lg">Verifique el número de radicado o intente con otros términos de búsqueda.</p>
+            </div>
+          )}
+
+          {!loading && !error && filteredData.length > 0 && (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredData.map((item) => {
+                const isResolved = item.estado === 'Resuelto';
+                return (
+                  <div 
+                    key={item.id} 
+                    onClick={() => onNavigate(`/consultas/${item.id}`)}
+                    className="group relative bg-white rounded-2xl p-7 shadow-sm border border-slate-200 hover:shadow-xl hover:shadow-slate-200/50 hover:border-indigo-200 transition-all duration-300 cursor-pointer flex flex-col h-full overflow-hidden"
+                  >
+                    {/* Status Indicator Bar */}
+                    <div className={`absolute top-0 left-0 w-full h-1.5 transition-colors duration-300 ${isResolved ? 'bg-emerald-400 group-hover:bg-emerald-500' : 'bg-amber-400 group-hover:bg-amber-500'}`} />
+
+                    <div className="flex justify-between items-start mb-5 mt-1">
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 text-slate-700 text-xs font-bold font-mono tracking-wide">
+                        {item.id}
+                      </span>
+                      <span className={`flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider ${isResolved ? 'text-emerald-600' : 'text-amber-600'}`}>
+                        {isResolved ? <ShieldCheck size={14} /> : <Clock size={14} />}
+                        {item.estado}
+                      </span>
+                    </div>
+                    
+                    <h3 className="text-xl font-bold text-slate-900 mb-3 group-hover:text-indigo-600 transition-colors leading-tight">
+                      {item.categoria}
+                    </h3>
+                    
+                    <p className="text-slate-600 text-sm mb-8 line-clamp-3 flex-1 font-light leading-relaxed">
+                      {item.descripcion}
+                    </p>
+                    
+                    <div className="pt-5 border-t border-slate-100 flex items-center justify-between mt-auto">
+                      <div className="flex flex-col">
+                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Radicado</span>
+                        <span className="text-slate-800 font-medium text-sm">{new Date(item.fechaRadicacion).toLocaleDateString()}</span>
+                      </div>
+                      <div className="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center text-indigo-500 group-hover:bg-indigo-500 group-hover:text-white transition-colors duration-300">
+                        <ArrowRight size={18} />
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
