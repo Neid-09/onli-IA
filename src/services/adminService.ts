@@ -120,6 +120,28 @@ export const adminService = {
         return { success: true, message: `Conexión exitosa con ${modelName}! Respuesta: "${reply}"` };
       }
 
+      if (provider === 'groq') {
+        const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${apiKey.trim()}`
+          },
+          body: JSON.stringify({
+            model: modelName || 'qwen/qwen3.8-27b',
+            messages: [{ role: 'user', content: 'Ping' }],
+            max_tokens: 5
+          })
+        });
+
+        const data = await res.json();
+        if (!res.ok) {
+          return { success: false, message: data.error?.message || `Error HTTP ${res.status}` };
+        }
+
+        return { success: true, message: `Conexión exitosa con Groq (${modelName || 'qwen/qwen3.8-27b'})!` };
+      }
+
       if (provider === 'grok') {
         const res = await fetch('https://api.x.ai/v1/chat/completions', {
           method: 'POST',

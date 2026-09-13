@@ -298,8 +298,17 @@ export default function RadicacionForm({ onSuccess }: Props) {
             disabled={loading}
             className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-lg shadow-blue-600/20 hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200 disabled:opacity-60 cursor-pointer"
           >
-            <Send size={18} />
-            <span>{loading ? 'Radicando en el Sistema...' : 'Radicar Petición Oficial'}</span>
+            {loading ? (
+              <>
+                <Sparkles size={18} className="animate-spin text-blue-200" />
+                <span>Radicando y delegando marco normativo con IA...</span>
+              </>
+            ) : (
+              <>
+                <Send size={18} />
+                <span>Radicar Petición Oficial</span>
+              </>
+            )}
           </button>
         </div>
       </form>

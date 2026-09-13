@@ -84,11 +84,49 @@ export const pqrsService = {
   },
 
   /**
-   * Crea un nuevo trámite en Supabase
+   * Crea un nuevo trámite en Supabase y genera automáticamente el borrador de respuesta con IA
    */
   async create(nuevo: Omit<PQRS, 'created_at'>): Promise<PQRS> {
     if (!isSupabaseConfigured) {
       throw new Error('Supabase no está configurado para operaciones de escritura.');
+    }
+
+    let borradorIa = nuevo.respuestaBorradorIa || '';
+    let fundamento = nuevo.fundamentoLegal || '';
+
+    // Si no trae borrador previo, la IA lo genera automáticamente
+    if (!borradorIa) {
+      try {
+        const { aiService } = await import('./ai/aiService');
+        const resolucionPromise = aiService.generateOfficialResolution(
+          nuevo.id,
+          nuevo.categoria,
+          nuevo.solicitante,
+          nuevo.descripcion
+        );
+
+        // Timeout de seguridad de 4 segundos para no bloquear la experiencia de radicación
+        const timeoutPromise = new Promise<{ propuesta: string; fundamento: string }>((resolve) =>
+          setTimeout(() => resolve({ propuesta: '', fundamento: '' }), 4000)
+        );
+
+        const res = await Promise.race([resolucionPromise, timeoutPromise]);
+        if (res.propuesta) {
+          borradorIa = res.propuesta;
+          fundamento = res.fundamento;
+        } else {
+          // Si tardó más del timeout, dejar la tarea en segundo plano para guardarlo al concluir
+          resolucionPromise
+            .then(async (lateRes) => {
+              if (lateRes.propuesta) {
+                await this.guardarBorradorIA(nuevo.id, lateRes.propuesta, lateRes.fundamento);
+              }
+            })
+            .catch((err) => console.warn('[IA Auto-Delegación Background] Error:', err));
+        }
+      } catch (err) {
+        console.warn('[IA Auto-Delegación] No se pudo generar borrador previo:', err);
+      }
     }
 
     const rowToInsert: Partial<PQRSRow> = {
@@ -100,6 +138,8 @@ export const pqrsService = {
       fecha_radicacion: nuevo.fechaRadicacion || new Date().toISOString(),
       plazo_legal: nuevo.plazoLegal,
       respuesta_oficial: nuevo.respuestaOficial || '',
+      respuesta_borrador_ia: borradorIa,
+      fundamento_legal: fundamento,
     };
 
     const { data, error } = await supabase

@@ -71,10 +71,16 @@ export default function AIConfigTab() {
   };
 
   const providerModels: Record<string, string[]> = {
+    groq: [
+      'qwen/qwen3.8-27b',
+      'qwen/qwen3.6-27b',
+      'openai/gpt-oss-120b',
+      'openai/gpt-oss-20b'
+    ],
     gemini: [
+      'gemini-3.5-flash-lite',
       'gemini-flash-latest',
       'gemini-3.7-flash',
-      'gemini-3.5-flash-lite',
       'gemini-3.1-flash-lite',
       'gemma-4-26b-a4b-it'
     ],
@@ -179,7 +185,8 @@ export default function AIConfigTab() {
                     }}
                     className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium capitalize"
                   >
-                    <option value="gemini">Google Gemini (Recomendado)</option>
+                    <option value="groq">Groq Cloud LPU (Ultra Rápido)</option>
+                    <option value="gemini">Google Gemini</option>
                     <option value="grok">xAI Grok</option>
                     <option value="openai">OpenAI</option>
                   </select>

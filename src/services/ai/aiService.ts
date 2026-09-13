@@ -1,5 +1,6 @@
 import type { IAIProvider, ExtractedDocumentData } from './aiTypes';
 import { GeminiProvider } from './geminiProvider';
+import { GroqProvider } from './groqProvider';
 import { supabase, isSupabaseConfigured } from '../../lib/supabase';
 
 class AIService {
@@ -9,7 +10,8 @@ class AIService {
 
   constructor() {
     this.chatProvider = new GeminiProvider();
-    this.ocrProvider = new GeminiProvider();
+    // Por defecto usar Groq para OCR según la solicitud
+    this.ocrProvider = new GroqProvider();
   }
 
   /**
@@ -27,10 +29,18 @@ class AIService {
       if (error || !data) return;
 
       for (const config of data) {
-        if (config.id === 'chat_assistant' && config.provider === 'gemini') {
-          this.chatProvider = new GeminiProvider(config.api_key);
-        } else if (config.id === 'ocr_multimodal' && config.provider === 'gemini') {
-          this.ocrProvider = new GeminiProvider(config.api_key);
+        if (config.id === 'chat_assistant') {
+          if (config.provider === 'groq') {
+            this.chatProvider = new GroqProvider(config.api_key);
+          } else {
+            this.chatProvider = new GeminiProvider(config.api_key);
+          }
+        } else if (config.id === 'ocr_multimodal') {
+          if (config.provider === 'groq') {
+            this.ocrProvider = new GroqProvider(config.api_key);
+          } else {
+            this.ocrProvider = new GeminiProvider(config.api_key);
+          }
         }
       }
 

@@ -3,10 +3,10 @@ import type { IAIProvider, ExtractedDocumentData, GeminiModel } from './aiTypes'
 export class GeminiProvider implements IAIProvider {
   name = 'Google Gemini Multimodal';
   private apiKey: string;
-  private primaryModel: GeminiModel = 'gemini-flash-latest';
+  private primaryModel: GeminiModel = 'gemini-3.5-flash-lite';
   private fallbackModels: GeminiModel[] = [
-    'gemini-3.5-flash-lite',
     'gemini-3.7-flash',
+    'gemini-flash-latest',
     'gemini-3.1-flash-lite',
     'gemma-4-26b-a4b-it'
   ];
