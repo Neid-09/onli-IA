@@ -7,6 +7,10 @@ export interface PQRS {
   fechaRadicacion: string;
   plazoLegal: string;
   respuestaOficial: string;
+  respuestaBorradorIa?: string;
+  funcionarioResponsable?: string;
+  fechaResolucion?: string;
+  fundamentoLegal?: string;
   created_at?: string;
 }
 
@@ -19,6 +23,10 @@ export interface PQRSRow {
   fecha_radicacion: string;
   plazo_legal: string;
   respuesta_oficial: string;
+  respuesta_borrador_ia?: string;
+  funcionario_responsable?: string;
+  fecha_resolucion?: string;
+  fundamento_legal?: string;
   created_at?: string;
   updated_at?: string;
 }

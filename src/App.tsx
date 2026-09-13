@@ -8,9 +8,12 @@ import { AuthProvider } from './context/AuthContext'
 import RadicacionForm from './components/tramites/RadicacionForm'
 import NormativasPage from './pages/NormativasPage'
 import AdminPage from './pages/AdminPage'
-import { Sparkles, FilePlus2, LayoutGrid, Scale } from 'lucide-react'
+import FuncionarioPage from './pages/FuncionarioPage'
+import { useAuth } from './context/AuthContext'
+import { Sparkles, FilePlus2, LayoutGrid, Scale, FileCheck } from 'lucide-react'
 
 function AppContent() {
+  const { profile } = useAuth();
   const [currentPath, setCurrentPath] = useState(window.location.pathname);
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [homeTab, setHomeTab] = useState<'radicar' | 'servicios'>('radicar');
@@ -29,9 +32,10 @@ function AppContent() {
   const isConsultas = currentPath === '/consultas';
   const isNormativas = currentPath === '/normativas';
   const isAdmin = currentPath === '/admin';
+  const isFuncionario = currentPath === '/funcionario';
   const isDetalle = currentPath.startsWith('/consultas/') && currentPath.length > '/consultas/'.length;
   const detalleId = isDetalle ? currentPath.split('/')[2] : null;
-  const isInicio = !isConsultas && !isDetalle && !isNormativas && !isAdmin;
+  const isInicio = !isConsultas && !isDetalle && !isNormativas && !isAdmin && !isFuncionario;
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-50">
@@ -72,6 +76,15 @@ function AppContent() {
                   <Scale size={15} />
                   <span>Normativa & Leyes</span>
                 </button>
+                {profile && (profile.role === 'funcionario' || profile.role === 'administrador') && (
+                  <button 
+                    onClick={() => navigate('/funcionario')} 
+                    className={`text-sm font-semibold transition-colors hover:text-emerald-600 flex items-center gap-1.5 ${isFuncionario ? 'text-emerald-600' : 'text-slate-600'}`}
+                  >
+                    <FileCheck size={15} className="text-emerald-600" />
+                    <span>Bandeja Funcionario</span>
+                  </button>
+                )}
               </nav>
               <div className="pl-4 border-l border-slate-200">
                 <UserNav onNavigate={navigate} />
@@ -159,6 +172,7 @@ function AppContent() {
         {isConsultas && <ConsultasPage onNavigate={navigate} />}
         {isNormativas && <NormativasPage />}
         {isAdmin && <AdminPage onNavigate={navigate} />}
+        {isFuncionario && <FuncionarioPage onNavigate={navigate} />}
         {isDetalle && detalleId && <DetalleConsultaPage id={detalleId} onNavigate={navigate} />}
       </div>
 

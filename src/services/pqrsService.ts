@@ -12,6 +12,10 @@ function mapRowToPQRS(row: PQRSRow): PQRS {
     fechaRadicacion: row.fecha_radicacion,
     plazoLegal: row.plazo_legal,
     respuestaOficial: row.respuesta_oficial || '',
+    respuestaBorradorIa: row.respuesta_borrador_ia || '',
+    funcionarioResponsable: row.funcionario_responsable || '',
+    fechaResolucion: row.fecha_resolucion,
+    fundamentoLegal: row.fundamento_legal || '',
     created_at: row.created_at,
   };
 }
@@ -110,5 +114,60 @@ export const pqrsService = {
     }
 
     return mapRowToPQRS(data as PQRSRow);
+  },
+
+  /**
+   * Resuelve oficialmente una PQRS con visto bueno de un funcionario
+   */
+  async resolverPQRS(
+    id: string,
+    respuestaOficial: string,
+    funcionarioNombre: string,
+    fundamentoLegal?: string
+  ): Promise<PQRS> {
+    if (!isSupabaseConfigured) throw new Error('Supabase no está configurado.');
+
+    const updatePayload: Partial<PQRSRow> = {
+      estado: 'Resuelto',
+      respuesta_oficial: respuestaOficial.trim(),
+      funcionario_responsable: funcionarioNombre.trim(),
+      fecha_resolucion: new Date().toISOString(),
+      fundamento_legal: fundamentoLegal ? fundamentoLegal.trim() : '',
+      updated_at: new Date().toISOString(),
+    };
+
+    const { data, error } = await supabase
+      .from('pqrs')
+      .update(updatePayload)
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) {
+      console.error(`Error al resolver PQRS ${id}:`, error);
+      throw error;
+    }
+
+    return mapRowToPQRS(data as PQRSRow);
+  },
+
+  /**
+   * Guarda un borrador generado por la IA para revisión posterior
+   */
+  async guardarBorradorIA(id: string, borrador: string, fundamentoLegal?: string): Promise<void> {
+    if (!isSupabaseConfigured) return;
+
+    const { error } = await supabase
+      .from('pqrs')
+      .update({
+        respuesta_borrador_ia: borrador,
+        fundamento_legal: fundamentoLegal || '',
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', id);
+
+    if (error) {
+      console.error(`Error al guardar borrador de IA para PQRS ${id}:`, error);
+    }
   }
 };

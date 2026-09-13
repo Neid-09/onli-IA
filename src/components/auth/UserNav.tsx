@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { LogOut, KeyRound, ChevronDown, Shield, LogIn } from 'lucide-react';
+import { LogOut, KeyRound, ChevronDown, Shield, LogIn, FileCheck } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import LoginModal from './LoginModal';
 import SetPasswordModal from './SetPasswordModal';
@@ -97,6 +97,19 @@ export default function UserNav({ onNavigate }: Props) {
           </div>
 
           <div className="py-1">
+            {(profile.role === 'funcionario' || profile.role === 'administrador') && (
+              <button
+                onClick={() => {
+                  setIsDropdownOpen(false);
+                  if (onNavigate) onNavigate('/funcionario');
+                }}
+                className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-emerald-700 hover:bg-emerald-50 transition-colors text-left font-bold"
+              >
+                <FileCheck size={16} className="text-emerald-600" />
+                <span>Bandeja de Funcionario</span>
+              </button>
+            )}
+
             {profile.role === 'administrador' && (
               <button
                 onClick={() => {
