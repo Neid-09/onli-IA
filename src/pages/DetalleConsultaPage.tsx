@@ -1,16 +1,7 @@
 import { useState, useEffect } from 'react';
 import { ArrowLeft, Copy, Check, FileText, Calendar, User, MessageSquare, ShieldCheck, AlertCircle } from 'lucide-react';
-
-interface PQRS {
-  id: string;
-  solicitante: string;
-  categoria: string;
-  descripcion: string;
-  estado: string;
-  fechaRadicacion: string;
-  plazoLegal: string;
-  respuestaOficial: string;
-}
+import { pqrsService } from '../services/pqrsService';
+import type { PQRS } from '../types/database.types';
 
 interface Props {
   id: string;
@@ -28,19 +19,13 @@ export default function DetalleConsultaPage({ id, onNavigate }: Props) {
       setLoading(true);
       setError(null);
       try {
-        const response = await fetch('/api/pqrs');
-        if (!response.ok) throw new Error('Error de red');
-        const data = await response.json();
-        const found = data.find((p: PQRS) => p.id === id);
-        
-        setTimeout(() => {
-          if (found) {
-            setItem(found);
-          } else {
-            setError('No se encontró el trámite con el radicado proporcionado.');
-          }
-          setLoading(false);
-        }, 500);
+        const found = await pqrsService.getById(id);
+        if (found) {
+          setItem(found);
+        } else {
+          setError('No se encontró el trámite con el radicado proporcionado.');
+        }
+        setLoading(false);
       } catch (e) {
         setError('Ocurrió un error al cargar la información del trámite.');
         setLoading(false);

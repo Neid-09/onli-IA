@@ -3,11 +3,15 @@ import TarjetaTramite from './components/TarjetaTramite'
 import ConsultasPage from './pages/ConsultasPage'
 import DetalleConsultaPage from './pages/DetalleConsultaPage'
 import ChatInterface from './components/chat/ChatInterface'
-import { Sparkles } from 'lucide-react'
+import UserNav from './components/auth/UserNav'
+import { AuthProvider } from './context/AuthContext'
+import RadicacionForm from './components/tramites/RadicacionForm'
+import { Sparkles, FilePlus2, LayoutGrid } from 'lucide-react'
 
-function App() {
+function AppContent() {
   const [currentPath, setCurrentPath] = useState(window.location.pathname);
   const [isChatOpen, setIsChatOpen] = useState(false);
+  const [homeTab, setHomeTab] = useState<'radicar' | 'servicios'>('radicar');
 
   useEffect(() => {
     const onPopState = () => setCurrentPath(window.location.pathname);
@@ -43,20 +47,25 @@ function App() {
                 <p className="text-sm text-slate-500 leading-tight">Atención y Reportes</p>
               </div>
             </div>
-            <nav className="flex items-center gap-6">
-              <button 
-                onClick={() => navigate('/')} 
-                className={`text-sm font-medium transition-colors hover:text-blue-600 ${isInicio ? 'text-blue-600' : 'text-slate-600'}`}
-              >
-                Inicio
-              </button>
-              <button 
-                onClick={() => navigate('/consultas')} 
-                className={`text-sm font-medium transition-colors hover:text-blue-600 ${isConsultas ? 'text-blue-600' : 'text-slate-600'}`}
-              >
-                Consultar Trámites
-              </button>
-            </nav>
+            <div className="flex items-center gap-6">
+              <nav className="flex items-center gap-6">
+                <button 
+                  onClick={() => navigate('/')} 
+                  className={`text-sm font-medium transition-colors hover:text-blue-600 ${isInicio ? 'text-blue-600' : 'text-slate-600'}`}
+                >
+                  Inicio
+                </button>
+                <button 
+                  onClick={() => navigate('/consultas')} 
+                  className={`text-sm font-medium transition-colors hover:text-blue-600 ${isConsultas ? 'text-blue-600' : 'text-slate-600'}`}
+                >
+                  Consultar Trámites
+                </button>
+              </nav>
+              <div className="pl-4 border-l border-slate-200">
+                <UserNav />
+              </div>
+            </div>
           </div>
         </div>
       </header>
@@ -69,36 +78,70 @@ function App() {
                 Atención y Servicios al <span className="text-blue-600">Ciudadano</span>
               </h1>
               <p className="text-lg md:text-xl text-slate-600 max-w-3xl mx-auto leading-relaxed">
-                Consulte información oficial, acceda a los canales de atención y envíe reportes sobre incidencias en la vía pública de manera rápida y segura.
+                Consulte información oficial, acceda a los canales de atención y radique peticiones o reportes ciudadanos directamente en línea.
               </p>
+
+              {/* Selector de Pestañas Home */}
+              <div className="flex justify-center pt-4">
+                <div className="inline-flex p-1.5 bg-slate-200/80 rounded-2xl shadow-inner gap-1">
+                  <button
+                    onClick={() => setHomeTab('radicar')}
+                    className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold text-sm transition-all duration-200 ${
+                      homeTab === 'radicar'
+                        ? 'bg-white text-blue-600 shadow-md shadow-slate-200'
+                        : 'text-slate-600 hover:text-slate-900'
+                    }`}
+                  >
+                    <FilePlus2 size={18} />
+                    <span>Radicar Petición Escrita</span>
+                  </button>
+                  <button
+                    onClick={() => setHomeTab('servicios')}
+                    className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold text-sm transition-all duration-200 ${
+                      homeTab === 'servicios'
+                        ? 'bg-white text-blue-600 shadow-md shadow-slate-200'
+                        : 'text-slate-600 hover:text-slate-900'
+                    }`}
+                  >
+                    <LayoutGrid size={18} />
+                    <span>Servicios Destacados</span>
+                  </button>
+                </div>
+              </div>
             </section>
 
-            <section id="respuestas" className="space-y-8" aria-labelledby="respuestas-title">
-              <div className="text-center max-w-2xl mx-auto space-y-4">
-                <h2 id="respuestas-title" className="text-3xl font-bold text-slate-900">Servicios Destacados</h2>
-                <p className="text-slate-600 text-lg">
-                  Seleccione un área para iniciar un reporte o consultar información del servicio.
-                </p>
-              </div>
+            {homeTab === 'radicar' ? (
+              <section className="animate-in fade-in duration-300">
+                <RadicacionForm onSuccess={(id) => navigate(`/consultas/${id}`)} />
+              </section>
+            ) : (
+              <section id="respuestas" className="space-y-8 animate-in fade-in duration-300" aria-labelledby="respuestas-title">
+                <div className="text-center max-w-2xl mx-auto space-y-4">
+                  <h2 id="respuestas-title" className="text-3xl font-bold text-slate-900">Servicios Destacados</h2>
+                  <p className="text-slate-600 text-lg">
+                    Seleccione un área para consultar información oficial del servicio.
+                  </p>
+                </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <TarjetaTramite
-                  titulo="Agua y Alcantarillado"
-                  descripcion="Reporte fugas, cortes, y problemas de alcantarillado en su sector."
-                  categoria="Servicios Básicos"
-                />
-                <TarjetaTramite
-                  titulo="Recolección de Basura"
-                  descripcion="Consulte horarios, y reporte acumulación o puntos críticos."
-                  categoria="Limpieza"
-                />
-                <TarjetaTramite
-                  titulo="Alumbrado Público"
-                  descripcion="Reporte luminarias apagadas, parpadeantes o postes caídos."
-                  categoria="Infraestructura"
-                />
-              </div>
-            </section>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  <TarjetaTramite
+                    titulo="Agua y Alcantarillado"
+                    descripcion="Reporte fugas, cortes, y problemas de alcantarillado en su sector."
+                    categoria="Servicios Básicos"
+                  />
+                  <TarjetaTramite
+                    titulo="Recolección de Basura"
+                    descripcion="Consulte horarios, y reporte acumulación o puntos críticos."
+                    categoria="Limpieza"
+                  />
+                  <TarjetaTramite
+                    titulo="Alumbrado Público"
+                    descripcion="Reporte luminarias apagadas, parpadeantes o postes caídos."
+                    categoria="Infraestructura"
+                  />
+                </div>
+              </section>
+            )}
           </main>
         )}
 
@@ -127,7 +170,14 @@ function App() {
         </button>
       )}
     </div>
-  )
+  );
 }
 
-export default App
+export default function App() {
+  return (
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
+  );
+}
+

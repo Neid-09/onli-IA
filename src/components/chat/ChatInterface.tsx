@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import ChatMessage from './ChatMessage';
 import InputBox from './InputBox';
-import { X, Minimize2, Maximize2, Sparkles } from 'lucide-react';
+import { X, Minimize2, Sparkles } from 'lucide-react';
 
 interface Message {
   role: 'user' | 'assistant' | 'system';

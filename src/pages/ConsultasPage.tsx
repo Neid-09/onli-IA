@@ -1,16 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Search, AlertCircle, Info, ArrowRight, ShieldCheck, Clock } from 'lucide-react';
-
-interface PQRS {
-  id: string;
-  solicitante: string;
-  categoria: string;
-  descripcion: string;
-  estado: string;
-  fechaRadicacion: string;
-  plazoLegal: string;
-  respuestaOficial: string;
-}
+import { pqrsService } from '../services/pqrsService';
+import type { PQRS } from '../types/database.types';
 
 export default function ConsultasPage({ onNavigate }: { onNavigate: (path: string) => void }) {
   const [data, setData] = useState<PQRS[]>([]);
@@ -22,15 +13,9 @@ export default function ConsultasPage({ onNavigate }: { onNavigate: (path: strin
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch('/api/pqrs');
-      if (!response.ok) {
-        throw new Error('Error al conectar con el servidor.');
-      }
-      const result = await response.json();
-      setTimeout(() => {
-        setData(result);
-        setLoading(false);
-      }, 800);
+      const result = await pqrsService.getAll();
+      setData(result);
+      setLoading(false);
     } catch (err: any) {
       setError('Hubo un problema al cargar los trámites. Por favor, revisa tu conexión o intenta de nuevo.');
       setLoading(false);
