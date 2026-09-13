@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { Send, CheckCircle2, Copy, Check, FileText, User, Mail, Tag, AlertCircle, Sparkles, ScanLine } from 'lucide-react';
+import { Send, CheckCircle2, Copy, Check, FileText, User, Mail, Tag, AlertCircle, Sparkles, ScanLine, Lock, Shield, LogIn } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { pqrsService } from '../../services/pqrsService';
 import DocumentScannerModal from './DocumentScannerModal';
+import LoginModal from '../auth/LoginModal';
 import type { ExtractedDocumentData } from '../../services/ai/aiTypes';
 
 interface Props {
@@ -10,7 +11,7 @@ interface Props {
 }
 
 export default function RadicacionForm({ onSuccess }: Props) {
-  const { profile } = useAuth();
+  const { user, profile, loading: authLoading } = useAuth();
   const [solicitante, setSolicitante] = useState(profile?.fullName || '');
   const [identificacion, setIdentificacion] = useState('');
   const [email, setEmail] = useState(profile?.email || '');
@@ -23,6 +24,7 @@ export default function RadicacionForm({ onSuccess }: Props) {
   const [copiado, setCopiado] = useState(false);
   const [isScannerOpen, setIsScannerOpen] = useState(false);
   const [ocrApplied, setOcrApplied] = useState(false);
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 
   const handleOcrExtracted = (data: ExtractedDocumentData) => {
     if (data.solicitante) setSolicitante(data.solicitante);
@@ -65,13 +67,15 @@ export default function RadicacionForm({ onSuccess }: Props) {
 
       const nuevoTramite = {
         id: radicadoId,
-        solicitante: solicitante.trim(),
+        solicitante: profile?.fullName || solicitante.trim(),
         categoria,
         descripcion: asunto ? `[${asunto.trim()}] ${descripcion.trim()}` : descripcion.trim(),
         estado: 'En trámite',
         fechaRadicacion: fechaRadicacion.toISOString(),
         plazoLegal: plazoLegal.toISOString(),
         respuestaOficial: '',
+        userId: user?.id,
+        solicitanteEmail: profile?.email || email.trim(),
       };
 
       await pqrsService.create(nuevoTramite);
@@ -147,8 +151,58 @@ export default function RadicacionForm({ onSuccess }: Props) {
     );
   }
 
+  if (authLoading) {
+    return (
+      <div className="bg-white rounded-3xl p-12 shadow-xl border border-slate-100 text-center max-w-xl mx-auto">
+        <div className="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+        <p className="text-slate-600 font-medium text-sm">Verificando estado de identificación...</p>
+      </div>
+    );
+  }
+
+  if (!user || !profile) {
+    return (
+      <div className="bg-white rounded-3xl p-8 md:p-12 shadow-xl border border-slate-200/90 text-center max-w-2xl mx-auto animate-in zoom-in-95 duration-300">
+        <div className="w-16 h-16 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-5 shadow-inner">
+          <Lock size={32} />
+        </div>
+        <h3 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight mb-3">
+          Identificación Ciudadana Requerida
+        </h3>
+        <p className="text-slate-600 text-sm sm:text-base leading-relaxed mb-8 max-w-lg mx-auto">
+          Conforme a las políticas de seguridad y privacidad, <strong>solo los ciudadanos registrados pueden radicar peticiones oficiales (PQR)</strong>. De esta manera garantizamos que las respuestas y resoluciones sean privadas y accesibles exclusivamente por usted.
+        </p>
+        <button
+          type="button"
+          onClick={() => setIsLoginModalOpen(true)}
+          className="inline-flex items-center gap-2.5 px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-lg shadow-blue-600/20 hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200 cursor-pointer text-sm"
+        >
+          <LogIn size={18} />
+          <span>Iniciar Sesión para Radicar</span>
+        </button>
+        <LoginModal isOpen={isLoginModalOpen} onClose={() => setIsLoginModalOpen(false)} />
+      </div>
+    );
+  }
+
   return (
     <div className="bg-white rounded-3xl p-8 md:p-10 shadow-xl shadow-slate-200/50 border border-slate-100 max-w-3xl mx-auto">
+      {/* Banner de Titularidad y Privacidad */}
+      <div className="mb-6 p-4 bg-emerald-50 border border-emerald-200 rounded-2xl flex items-center gap-3.5">
+        <div className="w-10 h-10 rounded-xl bg-emerald-600 text-white font-bold flex items-center justify-center text-sm shadow-xs shrink-0">
+          {profile.fullName?.charAt(0).toUpperCase() || 'C'}
+        </div>
+        <div className="min-w-0 flex-1">
+          <p className="text-xs font-bold text-emerald-950 truncate">
+            Titular Registrado: <span className="font-black text-emerald-700">{profile.fullName}</span> ({profile.email})
+          </p>
+          <p className="text-[11px] text-emerald-700 flex items-center gap-1 mt-0.5 font-medium">
+            <Shield size={12} />
+            <span>Expediente protegido. La respuesta oficial será confidencial y visible exclusivamente en su cuenta.</span>
+          </p>
+        </div>
+      </div>
+
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 pb-6 border-b border-slate-100">
         <div className="flex items-center gap-3">
           <div className="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">

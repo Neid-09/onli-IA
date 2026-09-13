@@ -1,19 +1,25 @@
 import { useState, useEffect } from 'react';
-import { Search, AlertCircle, Info, ArrowRight, ShieldCheck, Clock } from 'lucide-react';
+import { Search, AlertCircle, Info, ArrowRight, ShieldCheck, Clock, Shield, LogIn } from 'lucide-react';
 import { pqrsService } from '../services/pqrsService';
 import type { PQRS } from '../types/database.types';
+import { useAuth } from '../context/AuthContext';
+import LoginModal from '../components/auth/LoginModal';
 
 export default function ConsultasPage({ onNavigate }: { onNavigate: (path: string) => void }) {
+  const { user, profile, loading: authLoading } = useAuth();
   const [data, setData] = useState<PQRS[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const [isLoginOpen, setIsLoginOpen] = useState(false);
 
   const fetchData = async () => {
     setLoading(true);
     setError(null);
     try {
-      const result = await pqrsService.getAll();
+      // Si es ciudadano, solo consulta los trámites que le pertenecen
+      const userIdFilter = (profile?.role === 'ciudadano' && user?.id) ? user.id : undefined;
+      const result = await pqrsService.getAll(userIdFilter);
       setData(result);
       setLoading(false);
     } catch (err: any) {
@@ -23,8 +29,10 @@ export default function ConsultasPage({ onNavigate }: { onNavigate: (path: strin
   };
 
   useEffect(() => {
-    fetchData();
-  }, []);
+    if (!authLoading) {
+      fetchData();
+    }
+  }, [user?.id, profile?.role, authLoading]);
 
   const filteredData = data.filter((item) => {
     const searchLower = searchQuery.toLowerCase();
@@ -44,13 +52,52 @@ export default function ConsultasPage({ onNavigate }: { onNavigate: (path: strin
       <div className="max-w-6xl mx-auto pt-10">
         
         {/* Header */}
-        <div className="text-center max-w-3xl mx-auto mb-16">
-          <h1 className="text-4xl md:text-5xl font-black text-slate-900 tracking-tight mb-6">
-            Portal de Transparencia
-          </h1>
-          <p className="text-lg md:text-xl text-slate-600 font-light leading-relaxed">
-            Consulte el estado de sus peticiones, quejas, reclamos y sugerencias. Escriba su número de radicado o detalles del caso.
-          </p>
+        <div className="text-center max-w-3xl mx-auto mb-12">
+          {user && profile?.role === 'ciudadano' ? (
+            <>
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold border border-emerald-200 mb-4">
+                <Shield size={13} />
+                <span>Bandeja Personal de Ciudadano</span>
+              </div>
+              <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-slate-900 tracking-tight mb-4">
+                Mis Peticiones & Resoluciones
+              </h1>
+              <p className="text-base sm:text-lg text-slate-600 font-light leading-relaxed">
+                Expedientes radicados por <strong className="font-semibold text-slate-800">{profile.fullName}</strong>. Las respuestas oficiales aquí mostradas son de carácter privado y exclusivo para usted.
+              </p>
+            </>
+          ) : user && (profile?.role === 'funcionario' || profile?.role === 'administrador') ? (
+            <>
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-purple-100 text-purple-800 text-xs font-bold border border-purple-200 mb-4">
+                <ShieldCheck size={13} />
+                <span>Vista Oficial de Despacho</span>
+              </div>
+              <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-slate-900 tracking-tight mb-4">
+                Consulta General de Expedientes
+              </h1>
+              <p className="text-base sm:text-lg text-slate-600 font-light leading-relaxed">
+                Supervisión administrativa y seguimiento de expedientes radicados por los ciudadanos.
+              </p>
+            </>
+          ) : (
+            <>
+              <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-slate-900 tracking-tight mb-4">
+                Consulta de Trámites
+              </h1>
+              <p className="text-base sm:text-lg text-slate-600 font-light leading-relaxed">
+                Consulte el estado general de su expediente con el número de radicado. Para ver el contenido íntegro y su respuesta oficial, identifíquese con su cuenta ciudadana.
+              </p>
+              <div className="mt-4">
+                <button
+                  onClick={() => setIsLoginOpen(true)}
+                  className="inline-flex items-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-md transition-all cursor-pointer"
+                >
+                  <LogIn size={15} />
+                  <span>Iniciar Sesión para ver Mis Respuestas</span>
+                </button>
+              </div>
+            </>
+          )}
           
           {/* Search Bar */}
           <div className="relative mt-10 max-w-2xl mx-auto group">
@@ -151,6 +198,8 @@ export default function ConsultasPage({ onNavigate }: { onNavigate: (path: strin
           )}
         </div>
       </div>
+
+      <LoginModal isOpen={isLoginOpen} onClose={() => setIsLoginOpen(false)} />
     </div>
   );
 }

@@ -16,21 +16,29 @@ function mapRowToPQRS(row: PQRSRow): PQRS {
     funcionarioResponsable: row.funcionario_responsable || '',
     fechaResolucion: row.fecha_resolucion,
     fundamentoLegal: row.fundamento_legal || '',
+    userId: row.user_id || undefined,
+    solicitanteEmail: row.solicitante_email || undefined,
     created_at: row.created_at,
   };
 }
 
 export const pqrsService = {
   /**
-   * Obtiene todos los registros de trámites/PQRS
+   * Obtiene todos los registros de trámites/PQRS (opcionalmente filtrados por usuario titular)
    */
-  async getAll(): Promise<PQRS[]> {
+  async getAll(userId?: string): Promise<PQRS[]> {
     if (isSupabaseConfigured) {
       try {
-        const { data, error } = await supabase
+        let query = supabase
           .from('pqrs')
           .select('*')
           .order('fecha_radicacion', { ascending: false });
+
+        if (userId) {
+          query = query.eq('user_id', userId);
+        }
+
+        const { data, error } = await query;
 
         if (error) {
           console.error('Error al consultar Supabase:', error);
@@ -140,6 +148,8 @@ export const pqrsService = {
       respuesta_oficial: nuevo.respuestaOficial || '',
       respuesta_borrador_ia: borradorIa,
       fundamento_legal: fundamento,
+      user_id: nuevo.userId || null,
+      solicitante_email: nuevo.solicitanteEmail || '',
     };
 
     const { data, error } = await supabase

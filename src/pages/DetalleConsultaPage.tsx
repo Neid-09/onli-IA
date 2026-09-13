@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
-import { ArrowLeft, Copy, Check, FileText, Calendar, User, MessageSquare, ShieldCheck, AlertCircle } from 'lucide-react';
+import { ArrowLeft, Copy, Check, FileText, Calendar, User, MessageSquare, ShieldCheck, AlertCircle, Lock, LogIn } from 'lucide-react';
 import { pqrsService } from '../services/pqrsService';
 import type { PQRS } from '../types/database.types';
+import { useAuth } from '../context/AuthContext';
+import LoginModal from '../components/auth/LoginModal';
 
 interface Props {
   id: string;
@@ -9,10 +11,12 @@ interface Props {
 }
 
 export default function DetalleConsultaPage({ id, onNavigate }: Props) {
+  const { user, profile } = useAuth();
   const [item, setItem] = useState<PQRS | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [copiado, setCopiado] = useState(false);
+  const [isLoginOpen, setIsLoginOpen] = useState(false);
 
   useEffect(() => {
     const fetchDetalle = async () => {
@@ -73,6 +77,62 @@ export default function DetalleConsultaPage({ id, onNavigate }: Props) {
             <ArrowLeft size={18} />
             Volver a Consultas
           </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Verificación de Privacidad del Expediente
+  const isStaff = profile && (profile.role === 'funcionario' || profile.role === 'administrador');
+  const isOwner = user && (
+    (item.userId && item.userId === user.id) ||
+    (item.solicitanteEmail && item.solicitanteEmail.toLowerCase() === user.email?.toLowerCase()) ||
+    Boolean(profile?.fullName && item.solicitante.toLowerCase() === profile.fullName.toLowerCase())
+  );
+  const isProtected = Boolean(item.userId || item.solicitanteEmail);
+
+  if (isProtected && !isOwner && !isStaff) {
+    return (
+      <div className="min-h-[70vh] flex justify-center items-center p-4 animate-in fade-in duration-300">
+        <div className="bg-white rounded-3xl shadow-xl border border-slate-200 p-8 sm:p-10 text-center max-w-lg w-full relative overflow-hidden">
+          <div className="w-16 h-16 bg-amber-50 text-amber-600 rounded-2xl flex items-center justify-center mx-auto mb-5 shadow-inner">
+            <Lock size={32} />
+          </div>
+          <span className="text-xs font-bold text-amber-700 uppercase tracking-wider bg-amber-100 px-3 py-1 rounded-full inline-block mb-3">
+            Expediente con Reserva Legal
+          </span>
+          <h2 className="text-2xl sm:text-3xl font-black text-slate-900 mb-2 font-mono">
+            {item.id}
+          </h2>
+          <p className="text-slate-600 text-sm leading-relaxed mb-6">
+            Este trámite y su resolución oficial contienen información personal reservada. Por disposición legal, <strong>únicamente el ciudadano titular que radicó la petición o los funcionarios competentes</strong> pueden acceder a esta respuesta.
+          </p>
+          {!user ? (
+            <div className="space-y-3">
+              <button
+                onClick={() => setIsLoginOpen(true)}
+                className="w-full inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-sm transition-all shadow-md cursor-pointer"
+              >
+                <LogIn size={16} />
+                <span>Iniciar Sesión como Titular</span>
+              </button>
+              <button
+                onClick={() => onNavigate('/consultas')}
+                className="w-full text-xs font-semibold text-slate-500 hover:text-slate-800 py-2 cursor-pointer"
+              >
+                Volver a Consultas
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={() => onNavigate('/consultas')}
+              className="inline-flex items-center gap-2 px-6 py-3 bg-slate-900 text-white font-bold rounded-xl text-sm hover:bg-slate-800 transition-all cursor-pointer"
+            >
+              <ArrowLeft size={16} />
+              <span>Volver a Mis Consultas</span>
+            </button>
+          )}
+          <LoginModal isOpen={isLoginOpen} onClose={() => setIsLoginOpen(false)} />
         </div>
       </div>
     );

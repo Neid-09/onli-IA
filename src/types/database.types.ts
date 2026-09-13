@@ -11,6 +11,8 @@ export interface PQRS {
   funcionarioResponsable?: string;
   fechaResolucion?: string;
   fundamentoLegal?: string;
+  userId?: string;
+  solicitanteEmail?: string;
   created_at?: string;
 }
 
@@ -27,6 +29,8 @@ export interface PQRSRow {
   funcionario_responsable?: string;
   fecha_resolucion?: string;
   fundamento_legal?: string;
+  user_id?: string | null;
+  solicitante_email?: string | null;
   created_at?: string;
   updated_at?: string;
 }
